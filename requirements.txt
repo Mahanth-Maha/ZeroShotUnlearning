@@ -1,0 +1,10 @@
+numpy
+matplotlib
+tqdm
+pynvml
+pytorch
+torchvision
+kagglehub
+kaggle
+pandas 
+scipy
