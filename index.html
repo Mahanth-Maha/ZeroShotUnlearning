@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgetting the Past: Zero-Shot Unlearning in Deep Networks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: rgb(228, 231, 192);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .container2 {
+            max-width: 1200px;
+            margin: 30px auto 0 auto;
+            padding: 0 20px;
+        }
+        .container3 {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            color: #010b1e;
+        }
+        .my-link {
+            color: #007bff;           /* blue text */
+            text-decoration: none;    /* remove underline */
+            font-weight: 500;         /* slightly bold */
+            transition: color 0.3s;   /* smooth hover effect */
+        }
+
+        .my-link:hover {
+            color: #0056b3;           /* darker blue on hover */
+            text-decoration: underline; /* optional underline */
+        }
+
+
+        header {
+            background: #9fecff;
+            padding: 60px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #1b0000;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #010b1e;
+            margin-bottom: 30px;
+        }
+
+        .author {
+            font-size: 1.1em;
+            color: #1a4b8a;
+            margin-bottom: 10px;
+        }
+
+        .affiliation {
+            color: #1e5194;
+            font-size: 0.95em;
+        }
+
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #d45d0e;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: #28407a;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        main {
+            background: white;
+            margin: 40px auto;
+            border-radius: 20px;
+            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        section {
+            padding: 60px 40px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        section:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: #2d3748;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, #252d51 0%, #282e75 100%);
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            color: #4a5568;
+            margin: 30px 0 15px 0;
+        }
+
+        .abstract {
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            font-size: 1.05em;
+            line-height: 1.8;
+        }
+
+        .highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .highlight-card {
+            background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .highlight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .highlight-card h3 {
+            color: #667eea;
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .result-card:hover {
+            transform: scale(1.02);
+        }
+
+        .result-header {
+            background:  #2c3665;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .result-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.3em;
+        }
+
+        .result-body {
+            padding: 25px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .metric-value.perfect {
+            color: #48bb78;
+        }
+
+        .metric-value.excellent {
+            color: #667eea;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: #505159 ;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .method-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .step {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            min-width: 50px;
+            height: 50px;
+            background: #595c69;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .step-content h3 {
+            margin-top: 0;
+            color: #2d3748;
+        }
+
+        .code-block {
+            background: #313131;
+            color: #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            font-size: 0.95em;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            section {
+                padding: 40px 20px;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                text-align: center;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #48bb78;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge.new {
+            background: #f56565;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Forgetting the Past: Targeted Unlearning in Pretrained Deep Networks</h1>
+            <p class="subtitle">Zero-Shot Class Unlearning for Computer Vision</p>
+            <p class="author"><strong>Yalla Mahanth</strong></p>
+            <p class="affiliation">M.Tech Artificial Intelligence</p>
+            <p class="affiliation">Indian Institute of Science, Bengaluru</p>
+            <div class="buttons">
+                <a href="https://github.com/Mahanth-Maha/ZeroShotUnlearning" class="btn" target="_blank">View on GitHub</a>
+                <a href="https://github.com/Mahanth-Maha/ZeroShotUnlearning/blob/main/WhitePaper_ZeroShotUnlearning.pdf" class="btn btn-secondary" target="_blank">Read Paper 📄</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container2">
+        <section id="abstract">
+            <h2>Abstract</h2>
+            <div class="abstract">
+                The "right to be forgotten" presents a significant challenge for deep learning models, where removing the influence of specific data typically requires costly retraining from scratch. This paper addresses the problem of targeted class unlearning in a practical yet challenging <strong>zero-shot setting</strong>, where the original training data is entirely unavailable. We introduce a novel and scalable framework that leverages <strong>data-free class impressions</strong> — synthetic data proxies that capture the essence of a class — to guide a differential unlearning process. Our method achieves <strong>near-perfect forgetting (≈0% accuracy)</strong> on target classes while <strong>maintaining or improving performance</strong> on retained classes across models from LeNet5 to ResNet50 on ImageNet.
+            </div>
+        </section>
+
+        <section id="highlights">
+            <h2>Key Contributions</h2>
+            <div class="highlights">
+                <div class="highlight-card">
+                    <h3>Zero-Shot Unlearning</h3>
+                    <p>No access to original training data required. Works entirely with the pretrained model and class labels.</p>
+                </div>
+                <div class="highlight-card">
+                    <h3>Class Impressions</h3>
+                    <p>Generate data-free proxies by maximizing class-specific activations, serving as synthetic stand-ins for real data.</p>
+                </div>
+                <div class="highlight-card">
+                    <h3>Differential Loss</h3>
+                    <p>Simultaneous gradient ascent on forget classes and gradient descent on retain classes for selective unlearning.</p>
+                </div>
+                <div class="highlight-card">
+                    <h3>Scalability</h3>
+                    <p>Proven effectiveness from MNIST to ImageNet, including AlexNet and ResNet50 architectures.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="problem">
+            <h2>The Problem</h2>
+            <p>With regulations like GDPR and India's DPDPA, the "right to be forgotten" is now a legal imperative. When users request data removal, models must verifiably erase the data's influence. The naive solution — retraining from scratch — is computationally prohibitive for large models.</p>
+            
+            <h3>Zero-Shot Challenge</h3>
+            <p>The most practical scenario is when the original training data is <strong>completely unavailable</strong> due to privacy policies or data retention limits. Our method solves this by:</p>
+            <ul style="margin-top: 15px; padding-left: 20px;">
+                <li>Working with only the pretrained model and class indices to forget</li>
+                <li>Generating synthetic proxies that represent class-specific features</li>
+                <li>Selectively modifying only the tail-end of the network</li>
+            </ul>
+        </section>
+
+        <section id="method">
+            <h2>Our Method</h2>
+            <div class="method-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Generate Class Impressions</h3>
+                        <p>For each class, optimize a random noise input to maximize the class logit, creating a synthetic representation that the model considers quintessential for that class.</p>
+                        <div class="code-block">x*<sub>c</sub> = arg max<sub>x</sub> f<sub>θ</sub>(x)<sub>c</sub> - β||x||²</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Partition the Model</h3>
+                        <p>Freeze early layers (head) that contain general features. Only update the tail layers where class-specific features emerge, ensuring efficiency and stability.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Apply Differential Loss</h3>
+                        <p>Optimize a combined objective that performs gradient ascent on forget class impressions while performing gradient descent on retain class impressions.</p>
+                        <div class="code-block">L<sub>total</sub> = w<sub>f</sub> · L<sub>forget</sub> - w<sub>r</sub> · L<sub>retain</sub></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="results">
+            <h2>Results <span class="badge">SOTA Performance</span></h2>
+            
+            <h3>Summary Table</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Dataset</th>
+                        <th>Original Acc</th>
+                        <th>Forget Acc</th>
+                        <th>Retain Acc</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>LeNet5</strong></td>
+                        <td>MNIST</td>
+                        <td>99.07%</td>
+                        <td><strong style="color: #48bb78;">0.00%</strong></td>
+                        <td><strong style="color: #667eea;">99.44%</strong> ↑</td>
+                    </tr>
+                    <tr>
+                        <td><strong>KarpathyNet</strong></td>
+                        <td>CIFAR-10</td>
+                        <td>72.36%</td>
+                        <td><strong style="color: #48bb78;">0.00%</strong></td>
+                        <td><strong style="color: #667eea;">80.23%</strong> ↑</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AlexNet</strong></td>
+                        <td>ImageNet</td>
+                        <td>56.55%</td>
+                        <td><strong style="color: #48bb78;">0.01%</strong></td>
+                        <td><strong style="color: #667eea;">57.11%</strong> ↑</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ResNet50</strong></td>
+                        <td>ImageNet</td>
+                        <td>76.14%</td>
+                        <td><strong style="color: #48bb78;">0.01%</strong></td>
+                        <td><strong style="color: #667eea;">76.83%</strong> ↑</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Detailed Performance</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3>LeNet5 - MNIST</h3>
+                    </div>
+                    <div class="result-body">
+                        <div class="metric">
+                            <span class="metric-label">Forgotten Classes</span>
+                            <span class="metric-value">1, 2, 3, 4</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Forget Accuracy</span>
+                            <span class="metric-value perfect">0.00%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Retain Accuracy</span>
+                            <span class="metric-value excellent">99.44%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Performance Change</span>
+                            <span class="metric-value perfect">+0.37%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3>KarpathyNet - CIFAR-10</h3>
+                    </div>
+                    <div class="result-body">
+                        <div class="metric">
+                            <span class="metric-label">Forgotten Classes</span>
+                            <span class="metric-value">3, 4, 8</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Forget Accuracy</span>
+                            <span class="metric-value perfect">0.00%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Retain Accuracy</span>
+                            <span class="metric-value excellent">80.23%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Performance Change</span>
+                            <span class="metric-value perfect">+7.87%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3>AlexNet - ImageNet</h3>
+                    </div>
+                    <div class="result-body">
+                        <div class="metric">
+                            <span class="metric-label">Forgotten Classes</span>
+                            <span class="metric-value">100 classes</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Forget Accuracy</span>
+                            <span class="metric-value perfect">0.01%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Retain Accuracy</span>
+                            <span class="metric-value excellent">57.11%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Performance Change</span>
+                            <span class="metric-value perfect">+0.56%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3>ResNet50 - ImageNet</h3>
+                    </div>
+                    <div class="result-body">
+                        <div class="metric">
+                            <span class="metric-label">Forgotten Classes</span>
+                            <span class="metric-value">100 classes</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Forget Accuracy</span>
+                            <span class="metric-value perfect">0.01%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Retain Accuracy</span>
+                            <span class="metric-value excellent">76.83%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Performance Change</span>
+                            <span class="metric-value perfect">+0.69%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 40px;">Key Observations</h3>
+            <ul style="padding-left: 20px; margin-top: 15px;">
+                <li><strong>Perfect Forgetting:</strong> Achieved ≈0% accuracy on all forgotten classes across all architectures</li>
+                <li><strong>Knowledge Preservation:</strong> Not only maintained but often improved performance on retained classes</li>
+                <li><strong>Regularization Effect:</strong> The unlearning process appears to reduce inter-class confusion, particularly evident in the +7.87% improvement on CIFAR-10</li>
+                <li><strong>Scalability Proven:</strong> Successfully scaled to ImageNet with 100 classes removed from deep architectures</li>
+            </ul>
+        </section>
+
+        <section id="future">
+            <h2>Future Directions</h2>
+            <div class="highlights">
+                <div class="highlight-card">
+                    <h3>Vision Transformers</h3>
+                    <p>Adapt the framework to attention-based architectures like ViT and Swin-Transformers, investigating how class impressions manifest in patch-based models.</p>
+                </div>
+                <div class="highlight-card">
+                    <h3>Theoretical Guarantees</h3>
+                    <p>Develop formal proofs that unlearned models are statistically indistinguishable from Golden Standard Models retrained from scratch.</p>
+                </div>
+                <div class="highlight-card">
+                    <h3>Fine-Grained Unlearning</h3>
+                    <p>Extend from class-level to instance-level and attribute-level forgetting, enabling removal of specific individuals or features.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- <section id="citation">
+            <h2>Citation</h2>
+            <div class="code-block">
+@article{mahanth2025zeroshotunlearning,
+  title={Forgetting the Past: Targeted Unlearning in Pretrained Deep Networks for Computer Vision},
+  author={Mahanth, Yalla},
+  journal={Deep Learning for Computer Vision Course, IISc},
+  year={2025},
+  institution={Indian Institute of Science, Bengaluru}
+}
+            </div>
+        </section> -->
+    </main>
+
+    <footer>
+        <div class="container3">
+            <p>© 2025 Yalla Mahanth | <a class="my-link" href="https://mahanthyalla.in">mahanthyalla.in</a></p>
+            <p style="margin-top: 10px;">Deep Learning for Computer Vision Course (DLCV 2025) | Indian Institute of Science</p>
+        </div>
+    </footer>
+</body>
+</html>
