@@ -5,7 +5,7 @@
 Project Work for **Course** : **DS265 Deep Learning for Computer Vision (DLCV 2025), IISc Bangalore** 
 
 <p align="center">
-| <a href="https://github.com/Mahanth-Maha/ZeroShotUnlearning#usage"><b>Documentation</b></a> | <a href="https://mahanthyalla.in/blogs/p/zero-shot-unlearning/"><b>Blog</b></a> | <a href="./WhitePaper_ZeroShotUnlearning.pdf"><b>White Paper</b></a> |
+|  <a href="./WhitePaper_ZeroShotUnlearning.pdf"><b>📄 White Paper</b></a> | <a href="https://mahanthyalla.in/ZeroShotUnlearning"><b>🌐 Web Page</b></a> | <a href="https://mahanthyalla.in/blogs/p/zero-shot-unlearning/"><b> ✍️ Blog</b></a> | <a href="https://github.com/Mahanth-Maha/ZeroShotUnlearning#usage"><b>📃 Documentation</b></a> |
 </p>
 
 ## Project Overview
@@ -55,7 +55,7 @@ cd ZeroShotUnlearning
 
 ### 2. Create Conda Environment
 We recommend using Python 3.10 or later. Create a Conda environment using the provided `requirements.txt` file.
-
+install pytorch using command from [official website](https://pytorch.org/get-started/locally/) according to your environment
 ```bash
 # Create the environment named 'unlearn_env' (or choose your own)
 conda create --name unlearn_env python=3.10 -y
@@ -66,7 +66,7 @@ conda activate unlearn_env
 # Install PyTorch with CUDA support (adjust cuda version if needed)
 # Check PyTorch website (pytorch.org) for the correct command for your system/CUDA version
 # Example for CUDA 11.8:
-conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu126
 
 # Install other dependencies
 pip install -r requirements.txt
