@@ -1,6 +1,12 @@
 # Zero-Shot Class Unlearning in Deep Computer Vision Models
 
-Forgetting the Past: Targeted Unlearning in Pretrained Deep Networks for Computer Vision - Project Work for Course : DS265 Deep Learning for Computer Vision (DLCV 2025), IISc Bangalore 
+**Forgetting the Past**: Targeted Unlearning in Pretrained Deep Networks for Computer Vision
+
+Project Work for **Course** : **DS265 Deep Learning for Computer Vision (DLCV 2025), IISc Bangalore** 
+
+<p align="center">
+| <a href="https://github.com/Mahanth-Maha/ZeroShotUnlearning#usage"><b>Documentation</b></a> | <a href="https://mahanthyalla.in/blogs/p/zero-shot-unlearning/"><b>Blog</b></a> | <a href="./WhitePaper_ZeroShotUnlearning.pdf"><b>White Paper</b></a> |
+</p>
 
 ## Project Overview
 
