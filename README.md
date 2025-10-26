@@ -1,12 +1,25 @@
 # Zero-Shot Class Unlearning in Deep Computer Vision Models
 
-**Forgetting the Past**: Targeted Unlearning in Pretrained Deep Networks for Computer Vision
+This project explores **Zero-Shot Class Unlearning** in vision models — enabling a pretrained network to forget specific classes **without original data**, using **class impressions** and gradient-based updates to balance forgetting and retention under privacy constraints.
 
-Project Work for **Course** : **DS265 Deep Learning for Computer Vision (DLCV 2025), IISc Bangalore** 
+
+<div align="center">
+<br>
+<br>
+<br>
+<h2><strong>Forgetting the Past</strong>: Targeted Unlearning in Pretrained Deep Networks <br>for Computer Vision</h2>
+
+<p><em>Project Work for <strong>Course</strong> : <strong>DS265 Deep Learning for Computer Vision (DLCV 2025), IISc Bangalore</strong></em></p>
 
 <p align="center">
-| <a href="https://github.com/Mahanth-Maha/ZeroShotUnlearning#usage"><b>Documentation</b></a> | <a href="https://mahanthyalla.in/blogs/p/zero-shot-unlearning/"><b>Blog</b></a> | <a href="./WhitePaper_ZeroShotUnlearning.pdf"><b>White Paper</b></a> |
+|  
+<a href="./WhitePaper_ZeroShotUnlearning.pdf"><b>📄 White Paper</b></a> | 
+<a href="https://mahanthyalla.in/ZeroShotUnlearning"><b>🌐 Web Page</b></a> | 
+<a href="https://mahanthyalla.in/blogs/p/zero-shot-unlearning/"><b> ✍️ Blog</b></a> | 
+<a href="https://github.com/Mahanth-Maha/ZeroShotUnlearning#usage"><b>📃 Documentation</b></a> |
 </p>
+<br>
+</div>
 
 ## Project Overview
 
@@ -55,7 +68,7 @@ cd ZeroShotUnlearning
 
 ### 2. Create Conda Environment
 We recommend using Python 3.10 or later. Create a Conda environment using the provided `requirements.txt` file.
-
+install pytorch using command from [official website](https://pytorch.org/get-started/locally/) according to your environment
 ```bash
 # Create the environment named 'unlearn_env' (or choose your own)
 conda create --name unlearn_env python=3.10 -y
@@ -66,7 +79,7 @@ conda activate unlearn_env
 # Install PyTorch with CUDA support (adjust cuda version if needed)
 # Check PyTorch website (pytorch.org) for the correct command for your system/CUDA version
 # Example for CUDA 11.8:
-conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu126
 
 # Install other dependencies
 pip install -r requirements.txt
@@ -162,3 +175,24 @@ The unlearning scripts load a pre-trained model, generate or load class impressi
 class impressions generation: is the most time-consuming part of the unlearning process. but it is done only once for each class. The time complexity of generating class impressions is O(n * m), where n is the number of samples in the dataset and m is the number of classes. This is because we need to compute the class impression for each sample in the dataset for each class.
 
 After generating the class impressions, it is straightforward to compute the forget and retain datasets, and no matter what the number of classes is, the time complexity of this step is O(n), where n is the number of samples in the dataset, for unlearning. The unlearning process itself is O(k * n), where k is the number of epochs and n is the number of samples in the dataset. This is because we need to compute the gradients for each sample in the dataset for each epoch.
+
+
+
+---
+
+<p align="left">
+    <span style="
+    font-size:22px;
+    font-family:'Georgia', 'Garamond', 'Times New Roman', serif;
+    font-weight:700;
+    color:#94dfff;">
+    <a href="https://mahanthyalla.in" style="color:#94dfff; text-decoration:none;">
+      Mahanth Yalla
+    </a>
+  </span><br>
+  <span style="font-size: 16px; font-family:'Times New Roman', Times, serif;">
+      MTech - Artificial Intelligence,<br>
+      <strong>Indian Institute of Science,</strong><br>
+      Bangalore - 560012.<br>
+  </span>
+</p>
